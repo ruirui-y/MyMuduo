@@ -1,0 +1,20 @@
+# 忽略 CMake 和编译生成的临时文件
+build/
+bin/
+lib/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
+# 忽略 VS/VSCode 的配置目录 (如果你是用 VSCode 连的)
+.vscode/
+.vs/
+*.suo
+*.user
+
+# 忽略其他二进制或核心转储文件
+*.o
+*.a
+*.so
+core

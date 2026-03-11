@@ -1,0 +1,24 @@
+﻿{
+    "configurations": [
+        {
+            "name": "Linux-GCC-Debug",
+            "generator": "Unix Makefiles",
+            "configurationType": "Debug",
+            "cmakeExecutable": "cmake",
+            "remoteCopySourcesExclusionList": [ ".vs", ".git", "out" ],
+            "cmakeCommandArgs": "",
+            "buildCommandArgs": "",
+            "ctestCommandArgs": "",
+            "inheritEnvironments": [ "linux_x64" ],
+            "remoteMachineName": "${defaultRemoteMachineName}",
+            "remoteCMakeListsRoot": "$HOME/.vs/${projectDirName}/${workspaceHash}/src",
+            "remoteBuildRoot": "$HOME/.vs/${projectDirName}/${workspaceHash}/out/build/${name}",
+            "remoteInstallRoot": "$HOME/.vs/${projectDirName}/${workspaceHash}/out/install/${name}",
+            "remoteCopySources": true,
+            "rsyncCommandArgs": "-t --delete",
+            "remoteCopyBuildOutput": false,
+            "remoteCopySourcesMethod": "rsync",
+            "remoteCopyAdditionalIncludeDirectories": [ "/home/yjj/.vs/MPRPC/095085fd-d8be-48c3-92db-ff0eb307d2ce/src/test/protobuf_test", "" ]
+        }
+    ]
+}
