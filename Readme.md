@@ -28,7 +28,7 @@
 要求：CMake >= 3.14，支持 C++17。
 
 ```bash
-git clone [https://github.com/ruirui-y/MyMuduo.git](https://github.com/ruirui-y/MyMuduo.git)
+git clone https://github.com/ruirui-y/MyMuduo.git
 cd MyMuduo
 mkdir build && cd build
 cmake ..
