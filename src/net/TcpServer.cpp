@@ -1,6 +1,7 @@
 #include "net/TcpServer.h"
 #include "Log/Logger.h"
 #include "net/ThreadSwitcher.h"
+#include <signal.h>
 
 using namespace std::placeholders;
 
@@ -10,6 +11,9 @@ TcpServer::TcpServer(EventLoop* loop, const std::string& ip, uint16_t port, uint
     thread_pool_(std::make_unique<EventLoopThreadPool>(loop)),
     wheel_size_(conn_time_out)
 {
+    // 如果对端关闭了Socket，发送数据时对端会返回RST，本端继续往改Socket写数据，操作系统会发送SIGPIPE信号，默认情况下程序会终止
+    signal(SIGPIPE, SIG_IGN);
+
     // 绑定新连接到来的处理函数
     acceptor_->SetNewConnectionCallback(std::bind(&TcpServer::NewConnection, this, _1, _2));
     
