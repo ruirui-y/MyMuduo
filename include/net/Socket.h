@@ -20,7 +20,8 @@ public:
 	void Listen();																		// 监听
 	int Accept();																		// 接受连接				
 	void ShutdownWrite();																// 关闭写端fd
-	int GetTcpInfoError() const;														// 获取TCP错误信息										
+	int GetTcpInfoError() const;														// 获取TCP错误信息
+	void SetTcpNoDelay();																// 设置TCP无延迟
 private:
 	const int socket_fd_;
 };
