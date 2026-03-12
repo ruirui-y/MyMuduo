@@ -10,6 +10,9 @@ TcpConnection::TcpConnection(EventLoop* loop, int sockfd)
     channel_(new Channel(loop, sockfd)),
     state_(kConnecting)
 {
+    // ÉèÖÃTCPÎÞÑÓ³Ù
+    socket_->SetTcpNoDelay();
+
     channel_->SetWriteCallback(std::bind(&TcpConnection::HandleWrite, this));
     channel_->SetReadCallback(std::bind(&TcpConnection::HandleRead, this));
     channel_->SetCloseCallback(std::bind(&TcpConnection::HandleClose, this));

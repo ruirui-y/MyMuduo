@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <netinet/tcp.h>
 
 Socket::~Socket() 
 {
@@ -50,6 +51,7 @@ int Socket::Accept()
             LOG_ERROR << "Socket::accept error";
         }
     }
+    
     return connfd;
 }
 
@@ -70,4 +72,13 @@ int Socket::GetTcpInfoError() const
         return errno;
     }
     return optval;
+}
+
+void Socket::SetTcpNoDelay()
+{
+    int optval = 1;
+    if (::setsockopt(socket_fd_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval)) < 0)
+    {
+        LOG_ERROR << "sockets::setTcpNoDelay error";
+    }
 }
