@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 #include <sys/uio.h>
+#include <arpa/inet.h>
 
 /// A buffer class modeled after org.jboss.netty.buffer.ChannelBuffer
 ///
@@ -28,6 +29,7 @@ public:
 	size_t ReadableBytes() const { return write_index_ - read_index_; }		// 可读字节数
 	size_t WriteableBytes() const { return buffer_.size() - write_index_; }	// 可写字节数
 
+	// 添加char数组
 	void Append(const char* data, size_t len)
 	{
 		if (WriteableBytes() < len)
@@ -37,6 +39,29 @@ public:
 
 		std::copy(data, data + len, begin() + write_index_);
 		write_index_ += len;
+	}
+
+	// 追加int
+	void AppendInt32(int32_t x)
+	{
+		int32_t be32 = htonl(x);											// 转换成网络字节序
+		Append(static_cast<const char*>(static_cast<void*>(&be32)), sizeof(be32));
+	}
+
+	// 查询当前位置后4字节int数据，并不读取
+	int32_t PeekInt32() const
+	{
+		int32_t be32 = 0;
+		::memcpy(&be32, peek(), sizeof(be32));
+		return ntohl(be32);													// 转回主机字节序
+	}
+
+	// 读取 32 位整数 (移动读指针，用于剥离包头)
+	int32_t RetrieveInt32()
+	{
+		int32_t result = PeekInt32();
+		retrieve(sizeof(int32_t));
+		return result;
 	}
 
 	const char* peek() const { return begin() + read_index_; }				// 获取当前读指针
