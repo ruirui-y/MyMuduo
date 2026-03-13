@@ -29,7 +29,7 @@ EventLoop::EventLoop()
 	else
 	{
 		t_loopInThisThread = this;
-		wake_channel_->SetReadCallback(bind(&EventLoop::HandleRead, this));
+		wake_channel_->SetReadCallback([this]() { HandleRead(); });
 		wake_channel_->EnableReading();												// ¼àÌı»½ĞÑÊÂ¼ş									
 	}
 }

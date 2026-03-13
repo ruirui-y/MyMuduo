@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <sys/uio.h>
 #include <arpa/inet.h>
+#include <cstring>
+
 
 /// A buffer class modeled after org.jboss.netty.buffer.ChannelBuffer
 ///

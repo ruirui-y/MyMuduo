@@ -27,7 +27,7 @@ public:
 	void start()
 	{
 		running_ = true;
-		thread_ = std::thread(bind(&AsyncLogging::threadFunc, this));
+		thread_ = std::thread([this]() { threadFunc(); });
 	}
 
 	void stop()

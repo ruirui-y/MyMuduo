@@ -9,8 +9,17 @@ class EchoServer
 public:
     EchoServer(EventLoop* loop, const std::string& ip, uint16_t port)
         : server_(loop, ip, port, 10) {
-        server_.SetConnectionCallback(std::bind(&EchoServer::OnConnection, this, std::placeholders::_1));
-        server_.SetMessageCallback(std::bind(&EchoServer::OnMessage, this, std::placeholders::_1, std::placeholders::_2));
+        server_.SetConnectionCallback(
+            [this](const std::shared_ptr<TcpConnection>& conn)
+            {
+                OnConnection(conn);
+            });
+
+        server_.SetMessageCallback(
+            [this](const std::shared_ptr<TcpConnection>& conn, Buffer* buffer)
+            {
+                OnMessage(conn, buffer);
+            });
     }
 
     void Start(int threadNum) {

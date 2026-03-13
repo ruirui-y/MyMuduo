@@ -13,10 +13,10 @@ TcpConnection::TcpConnection(EventLoop* loop, int sockfd)
     // 设置TCP无延迟
     socket_->SetTcpNoDelay();
 
-    channel_->SetWriteCallback(std::bind(&TcpConnection::HandleWrite, this));
-    channel_->SetReadCallback(std::bind(&TcpConnection::HandleRead, this));
-    channel_->SetCloseCallback(std::bind(&TcpConnection::HandleClose, this));
-    channel_->SetErrorCallback(std::bind(&TcpConnection::HandleError, this));
+    channel_->SetWriteCallback([this]() { HandleWrite(); });
+    channel_->SetReadCallback([this]() { HandleRead(); });
+    channel_->SetCloseCallback([this]() {HandleClose(); });
+    channel_->SetErrorCallback([this]() {HandleError();  });
 }
 
 TcpConnection::~TcpConnection()
@@ -55,7 +55,7 @@ void TcpConnection::Send(const std::string& data)
         else
         {
             // conn与调用者不在同一个线程，将该任务投递到conn所在的线程中执行
-            loop_->RunInLoop(std::bind(&TcpConnection::SendInLoop, this, data));
+            loop_->RunInLoop([this, data]() { SendInLoop(data); });
         }
     }
 }
@@ -102,7 +102,7 @@ void TcpConnection::ShutDown()
     if (state_ == kConnected)
     {
         SetState(kDisconnecting);
-        loop_->RunInLoop(std::bind(&TcpConnection::ShutDownInLoop, this));
+        loop_->RunInLoop([this]() { ShutDownInLoop(); });
     }
 }
 
@@ -111,7 +111,8 @@ void TcpConnection::ForceClose()
     if (state_ == kConnected || state_ == kDisconnecting)
     {
         SetState(kDisconnecting);
-        loop_->RunInLoop(std::bind(&TcpConnection::HandleClose, shared_from_this()));
+        auto conn = shared_from_this();
+        loop_->RunInLoop([conn]() { conn->HandleClose(); });
     }
 }
 

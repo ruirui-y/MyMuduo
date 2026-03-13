@@ -3,11 +3,11 @@ project(MyMuduo)
 
 # 1. 编译选项 (设置 C++17, 开启多线程, 以及调试信息)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -pthread -fno-omit-frame-pointer")
 
 # 开启 ASan 内存检测 (如果后续要发布 release 版本，可以把这两行注释掉)
-add_compile_options(-fsanitize=address -g)
-add_link_options(-fsanitize=address)
+# add_compile_options(-fsanitize=address -g)
+# add_link_options(-fsanitize=address)
 
 # 2. 全局头文件搜索路径 (第三方库)
 include_directories(/usr/include)

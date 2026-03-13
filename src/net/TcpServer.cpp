@@ -15,8 +15,12 @@ TcpServer::TcpServer(EventLoop* loop, const std::string& ip, uint16_t port, uint
     signal(SIGPIPE, SIG_IGN);
 
     // 绑定新连接到来的处理函数
-    acceptor_->SetNewConnectionCallback(std::bind(&TcpServer::NewConnection, this, _1, _2));
-    
+    acceptor_->SetNewConnectionCallback(
+        [this](int socket_fd, const std::string& peer_addr)
+        {
+            NewConnection(socket_fd, peer_addr);
+        });
+
     // 初始化时间轮的大小
     wheel_.resize(wheel_size_);
 }
@@ -112,7 +116,11 @@ void TcpServer::NewConnection(int sockfd, const std::string& peerAddr)
 
     conn->SetMessageCallback(wrapped_message_cb);
     conn->SetConnectionCallback(connection_callback_);
-    conn->SetCloseCallback(std::bind(&TcpServer::RemoveConnection, this, std::placeholders::_1));
+    conn->SetCloseCallback(
+        [this](const std::shared_ptr<TcpConnection>& conn)
+        {
+            RemoveConnection(conn);
+        });
 
     // 4. 将连接加入 map 管理
     connections_[sockfd] = std::move(conn);

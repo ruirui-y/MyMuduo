@@ -31,7 +31,7 @@ TimerQueue::TimerQueue(EventLoop* loop)
     timerfd_(createTimerfd()),
     timerfd_channel_(loop, timerfd_)
 {
-    timerfd_channel_.SetReadCallback(std::bind(&TimerQueue::HandleRead, this));
+    timerfd_channel_.SetReadCallback([this]() { HandleRead(); });
     timerfd_channel_.EnableReading();                                                            // 开启定时器的监听
 }
 

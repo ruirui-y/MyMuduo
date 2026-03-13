@@ -14,7 +14,7 @@ Acceptor::Acceptor(EventLoop* loop, const std::string& ip, uint16_t port)
     idle_fd_(::open("/dev/null", O_RDONLY | O_CLOEXEC))
 {
     accept_socket_.BindAddress(ip, port);
-	accept_channel_.SetReadCallback(bind(&Acceptor::HandleRead, this));
+    accept_channel_.SetReadCallback([this]() { HandleRead(); });
 }
 
 Acceptor::~Acceptor()
