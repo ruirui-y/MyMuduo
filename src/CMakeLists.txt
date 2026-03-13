@@ -18,8 +18,7 @@ target_include_directories(mymuduo PUBLIC
 
 # 链接第三方依赖库 
 # 注意：因为你自己写了 Muduo，所以我把你原本写的 muduo_net 和 muduo_base 删掉了，不要去链接原版的库！
-target_link_libraries(mymuduo PUBLIC pthread mysqlcppconn hiredis protobuf zookeeper_mt)
-
+target_link_libraries(mymuduo PUBLIC pthread)
 
 # ==========================================
 # 3. 编译你的测试程序 (直接链接静态库)
