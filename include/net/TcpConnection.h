@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <functional>
+#include <any>
 
 class EventLoop;
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>, noncopyable
@@ -70,6 +71,11 @@ public:
 	// 时间轮
 	void SetEntry(const EntryPtr& entry) { entry_ = entry; }
 
+	// 新增Context，为了绑定连接的属性，比如user_id
+	void SetContext(const std::any& context) { context_ = context; }
+	const std::any& GetContext() const { return context_; }
+	std::any* GetMutableContext() { return &context_; }
+
 private:
 	void HandleRead();															// 处理读事件
 	void HandleWrite();															// 处理写事件	
@@ -92,6 +98,8 @@ private:
 	StateE state_;																// 连接状态
 
 	std::weak_ptr<Entry> entry_;												// conn的包装器，用于挪移到时间轮的桶子里
+
+	std::any context_;															// 万能口袋
 };
 
 #endif
