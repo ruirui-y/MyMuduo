@@ -11,6 +11,13 @@
 #include <any>
 
 class EventLoop;
+class TcpConnection;
+using TcpConnectionPtr = std::shared_ptr<TcpConnection>;
+using ConnectionCallback = std::function<void(const TcpConnectionPtr&)>;
+using MessageCallback = std::function<void(const TcpConnectionPtr&, Buffer*)>;
+using CloseCallback = std::function<void(const TcpConnectionPtr&)>;
+using WriteCompleteCallback = std::function<void(const TcpConnectionPtr&)>;									// 数据被彻底写进网卡（OutputBuffer 被清空）时的回调
+
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>, noncopyable
 {
 public:
@@ -25,10 +32,6 @@ public:
 
 public:
 	enum StateE { kDisconnected, kConnecting, kConnected, kDisconnecting };
-	// 在 TcpConnection.h 中
-	using MessageCallback = std::function<void(const std::shared_ptr<TcpConnection>&, Buffer*)>;
-	using ConnectionCallback = std::function<void(const std::shared_ptr<TcpConnection>&)>;
-	using CloseCallback = std::function<void(const std::shared_ptr<TcpConnection>&)>;
 
 	TcpConnection(EventLoop* loop, int socket_fd);
 	~TcpConnection();
@@ -48,6 +51,7 @@ public:
 	void SetMessageCallback(MessageCallback cb) { message_callback_ = std::move(cb); }
 	void SetConnectionCallback(const ConnectionCallback& cb) { connection_callback_ = cb; }
 	void SetCloseCallback(const CloseCallback& cb) { close_callback_ = cb; }
+	void SetWriteCompleteCallback(WriteCompleteCallback cb) { write_complete_callback_ = std::move(cb); }
 
 	// 发送数据
 	void Send(const std::string& data);
@@ -91,6 +95,7 @@ private:
 	MessageCallback message_callback_;
     ConnectionCallback connection_callback_;
 	CloseCallback close_callback_;
+	WriteCompleteCallback write_complete_callback_;
 
 	Buffer output_buffer_;														// 写数据缓冲
 	Buffer input_buffer_;														// 读数据缓冲
