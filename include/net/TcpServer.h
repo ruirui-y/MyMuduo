@@ -17,8 +17,8 @@ public:
 	~TcpServer();
 
 	void Start(int thread_num);
-	void SetMessageCallback(TcpConnection::MessageCallback cb) { message_cb_ = cb; }
-	void SetConnectionCallback(const TcpConnection::ConnectionCallback& cb) { connection_callback_ = cb; }
+	void SetMessageCallback(MessageCallback cb) { message_cb_ = cb; }
+	void SetConnectionCallback(const ConnectionCallback& cb) { connection_callback_ = cb; }
 
 private:
 	void NewConnection(int sockfd, const std::string& peerAddr);									// 处理新连接的回调
@@ -37,8 +37,8 @@ private:
 	// 连接池
 	std::map<int, std::shared_ptr<TcpConnection>> connections_;
 
-	TcpConnection::MessageCallback message_cb_;
-    TcpConnection::ConnectionCallback connection_callback_;
+	MessageCallback message_cb_;
+    ConnectionCallback connection_callback_;
 
 	// 线程池
 	std::unique_ptr<EventLoopThreadPool> thread_pool_;
