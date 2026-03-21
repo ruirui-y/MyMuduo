@@ -1,0 +1,54 @@
+#ifndef MYMUDUO_TCPCLIENT_H
+#define MYMUDUO_TCPCLIENT_H
+
+#include "net/EventLoop.h"
+#include "net/TcpConnection.h"
+#include "net/Connector.h"
+#include <mutex>
+
+class TcpClient : noncopyable
+{
+public:
+	TcpClient(EventLoop* loop, const std::string& ip, uint16_t port, const std::string& name_arg);
+
+	~TcpClient();
+
+	void Connect();
+	void Disconnect();
+	void Stop();
+
+	TcpConnectionPtr Connection() const
+	{
+		std::lock_guard<std::mutex> lock(mutex_);
+		return connection_;
+	}
+
+    EventLoop* getLoop() const { return loop_; }
+    const std::string& name() const { return name_; }
+
+    void SetConnectionCallback(ConnectionCallback cb) { connection_callback_ = std::move(cb); }
+    void SetMessageCallback(MessageCallback cb) { message_callback_ = std::move(cb); }
+    void SetWriteCompleteCallback(WriteCompleteCallback cb) { write_complete_callback_ = std::move(cb); }
+
+private:
+    void NewConnection(int sockfd);
+    void RemoveConnection(const TcpConnectionPtr& conn);
+
+private:
+    EventLoop* loop_;
+    ConnectorPtr connector_;
+    const std::string name_;
+
+    ConnectionCallback connection_callback_;
+    MessageCallback message_callback_;
+    WriteCompleteCallback write_complete_callback_;
+
+    std::atomic<bool> retry_;
+    std::atomic<bool> connect_;
+
+    int nextConnId_;
+    mutable std::mutex mutex_;
+    TcpConnectionPtr connection_;
+};
+
+#endif
