@@ -75,13 +75,21 @@ void TcpConnection::SendInLoop(const std::string& data)
             {
                 LOG_WARN << "Write only " << nwrote << " bytes instead of " << data.size();
             }
+            else
+            {
+                // 调用写完成回调，同样，变成异步，避免栈耗尽
+                if (write_complete_callback_)
+                {
+                    loop_->QueueInLoop(std::bind(write_complete_callback_, shared_from_this()));
+                }
+            }
         }
         else
         {
             nwrote = 0;
             if (errno != EWOULDBLOCK)
             {
-
+                LOG_ERROR << "SendInLoop Error";
             }
         }
     }
@@ -200,6 +208,13 @@ void TcpConnection::HandleWrite()
             if (output_buffer_.ReadableBytes() == 0)
             {
                 channel_->DisableWriting();
+
+                // 执行写完成回调, 这里之所以QueueInLoop，是因为用户回调函数可能会继续调用Send，如果在Send里面也调用了write_complete_callback_
+                // 栈就会一直嵌套下去，形成递归, 直到栈空间耗尽，导致程序崩溃
+                if (write_complete_callback_)
+                {
+                    loop_->QueueInLoop(std::bind(write_complete_callback_, shared_from_this()));
+                }
 
                 // 如果用户之前调用了 Shutdown()，状态会变成 kDisconnecting
                 // 此时数据发完了，我们可以安全地关闭写端了
