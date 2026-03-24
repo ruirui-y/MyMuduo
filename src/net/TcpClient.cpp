@@ -1,6 +1,7 @@
 #include "net/TcpClient.h"
 #include "Log/Logger.h"
 #include <sys/socket.h>
+#include "net/ThreadSwitcher.h"
 
 using namespace std::placeholders;
 
@@ -81,10 +82,19 @@ void TcpClient::NewConnection(int sockfd)
 void TcpClient::RemoveConnection(const TcpConnectionPtr& conn)
 {
     loop_->AssertInLoopThread();
+
+    ThreadSwitcher::Run(conn->GetLoop(), conn, &TcpConnection::ConnectDestroyed);
+
     {
         std::lock_guard<std::mutex> lock(mutex_);
         connection_.reset();
     }
 
-    loop_->QueueInLoop(std::bind(&TcpConnection::ConnectDestroyed, conn));
+    // 检查是否是超时断开，如果不是业务端的连接断开，自动重新连接
+    if (retry_ && connect_)
+    {
+        LOG_INFO << "TcpClient::RemoveConnection - Reconnecting to " << connector_->GetIp() << " " << connector_->GetPort();
+        // 让工兵 Connector 重新挂到 epoll 上去发起非阻塞 connect！
+        connector_->Start();
+    }
 }

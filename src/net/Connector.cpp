@@ -126,6 +126,7 @@ void Connector::Connecting(int sockfd)
     channel_->EnableWriting();
 }
 
+// 三次握手结束后，就会触发写事件
 void Connector::HandleWrite() 
 {
     LOG_INFO << "Connector::handleWrite " << state_;
@@ -151,7 +152,8 @@ void Connector::HandleWrite()
             if (connect_)
             {
                 // 连接成功！通知大当家 TcpClient 去创建 TcpConnection！
-                new_connection_callback_(sockfd);
+                if(new_connection_callback_)
+                    new_connection_callback_(sockfd);
             }
             else 
             {

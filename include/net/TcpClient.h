@@ -25,6 +25,7 @@ public:
 
     EventLoop* getLoop() const { return loop_; }
     const std::string& name() const { return name_; }
+    void SetRetry(bool bRetry) { retry_ = bRetry; }
 
     void SetConnectionCallback(ConnectionCallback cb) { connection_callback_ = std::move(cb); }
     void SetMessageCallback(MessageCallback cb) { message_callback_ = std::move(cb); }
@@ -43,8 +44,8 @@ private:
     MessageCallback message_callback_;
     WriteCompleteCallback write_complete_callback_;
 
-    std::atomic<bool> retry_;
-    std::atomic<bool> connect_;
+    std::atomic<bool> retry_;                                                                       // 是否重新连接
+    std::atomic<bool> connect_;                                                                     // 业务层是否主动断开连接
 
     int nextConnId_;
     mutable std::mutex mutex_;

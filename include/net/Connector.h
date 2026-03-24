@@ -21,6 +21,9 @@ public:
 	void Start();																							// 启动连接
 	void Stop();																							// 停止连接
 
+	std::string GetIp() const { return ip_; }
+	int GetPort() const { return port_; }
+
 private:
 	void StartInLoop();
 	void StopInLoop();
