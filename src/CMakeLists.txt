@@ -3,12 +3,13 @@
 # ==========================================
 aux_source_directory(${PROJECT_SOURCE_DIR}/src/Log LOG_SRC)
 aux_source_directory(${PROJECT_SOURCE_DIR}/src/net NET_SRC)
-set(BASE_SRC ${LOG_SRC} ${NET_SRC})
+aux_source_directory(${PROJECT_SOURCE_DIR}/src/base BASE_SRC)
+set(SRC ${LOG_SRC} ${NET_SRC} ${BASE_SRC})
 
 # ==========================================
 # 2. 生成静态库：libmymuduo.a
 # ==========================================
-add_library(mymuduo STATIC ${BASE_SRC})
+add_library(mymuduo STATIC ${SRC})
 
 # 【关键魔法】告诉 CMake：凡是链接了 mymuduo 的程序，自动包含以下头文件路径！
 target_include_directories(mymuduo PUBLIC 
