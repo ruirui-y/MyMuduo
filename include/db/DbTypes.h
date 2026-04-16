@@ -4,9 +4,10 @@
 #include <vector>
 #include <unordered_map>
 #include <variant>
+#include <cstdint>
 
 // 1. 替代 QVariant: 支持空值、整数、浮点数、布尔值和字符串
-using DbValue = std::variant<std::monostate, int, double, bool, std::string>;
+using DbValue = std::variant<std::monostate, int, int64_t, double, bool, std::string>;
 
 // 2. 替代 QList<QVariant>: 用于存放 SQL 绑定的参数
 using DbParams = std::vector<DbValue>;

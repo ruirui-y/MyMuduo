@@ -17,7 +17,7 @@ void DbExecutor::AsyncQuery(EventLoop* loop, ThreadPool* threadPool,
     threadPool->run([loop, sql, params, cb]()
         {
             DbResultSet results;
-            auto conn = ConnectionPool::Instance().GetConnection(); // 注意大小写：根据你 ConnectionPool 的实现可能是 getConnection 
+            auto conn = ConnectionPool::Instance().GetConnection(); 
 
             if (conn)
             {
@@ -176,6 +176,10 @@ void DbExecutor::bindParams(sql::PreparedStatement* pstmt, const DbParams& param
         else if (std::holds_alternative<int>(val)) {
             pstmt->setInt(index, std::get<int>(val));
         }
+        // 架构师补丁：完美支持 64 位整型 (int64_t)
+        else if (std::holds_alternative<int64_t>(val)) {
+            pstmt->setInt64(index, std::get<int64_t>(val));
+        }
         else if (std::holds_alternative<std::string>(val)) {
             pstmt->setString(index, std::get<std::string>(val));
         }
@@ -205,16 +209,18 @@ DbValue DbExecutor::extractDbValue(sql::ResultSet* res, sql::ResultSetMetaData* 
     case sql::DataType::INTEGER:
         return res->getInt(index);
 
+    // 架构师补丁：既然 Variant 支持了，这里直接用原生 64 位整型接盘！
+    case sql::DataType::BIGINT:
+        return res->getInt64(index);
+
     // 普通浮点数
     case sql::DataType::REAL:
     case sql::DataType::DOUBLE:
         return static_cast<double>(res->getDouble(index));
 
-    // 高精度浮点数
+        // 高精度定点数 (防财务事故，依然保持 string 降维提取)
     case sql::DataType::DECIMAL:
     case sql::DataType::NUMERIC:
-    case sql::DataType::BIGINT:
-        // 拦截 64 位整型，强制转为 string 防止溢出丢失精度
         return res->getString(index);
 
     case sql::DataType::CHAR:
