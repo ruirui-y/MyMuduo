@@ -66,10 +66,11 @@ void DbExecutor::AsyncQuery(EventLoop* loop, ThreadPool* threadPool,
 }
 
 void DbExecutor::AsyncUpdate(EventLoop* loop, ThreadPool* threadPool,
-    const std::string& sql, const DbParams& params, UpdateCallback cb)
+    const std::string& sql, const DbParams& params, UpdateCallback cb, bool fetch_insert_id)
 {
-    threadPool->run([loop, sql, params, cb]() {
+    threadPool->run([loop, sql, params, cb, fetch_insert_id]() {
         int affectedRows = -1;
+        int64_t last_insert_id = 0;
         auto conn = ConnectionPool::Instance().GetConnection();
 
         if (conn) {
@@ -78,6 +79,16 @@ void DbExecutor::AsyncUpdate(EventLoop* loop, ThreadPool* threadPool,
                 std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(sql));
                 bindParams(pstmt.get(), params);
                 affectedRows = pstmt->executeUpdate();
+
+                // 架构师之门：只有业务层明确要求查，并且确实执行成功了，才去查！
+                if (fetch_insert_id && affectedRows > 0) 
+                {
+                    std::unique_ptr<sql::Statement> stmt(conn->createStatement());
+                    std::unique_ptr<sql::ResultSet> res(stmt->executeQuery("SELECT LAST_INSERT_ID()"));
+                    if (res->next()) {
+                        last_insert_id = res->getInt64(1);
+                    }
+                }
             }
             catch (sql::SQLException& e) {
                 LOG_ERROR << "SQL Update Error: " << e.what()
@@ -90,8 +101,8 @@ void DbExecutor::AsyncUpdate(EventLoop* loop, ThreadPool* threadPool,
 
         // 执行完毕，回到主网络线程通知结果
         if (cb && loop) {
-            loop->RunInLoop([cb, affectedRows]() {
-                cb(affectedRows);
+            loop->RunInLoop([cb, affectedRows, last_insert_id]() {
+                cb(affectedRows, last_insert_id);
                 });
         }
         });

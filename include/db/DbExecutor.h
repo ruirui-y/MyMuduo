@@ -18,9 +18,9 @@ namespace sql {
 
 class DbExecutor {
 public:
-    using QueryCallback = std::function<void(const DbResultSet&)>;              // 查询回调
-    using UpdateCallback = std::function<void(int affectedRows)>;               // 插入或者删除回调
-    using TransactionCallback = std::function<void(bool success)>;              // 事务回调：成功或失败
+    using QueryCallback = std::function<void(const DbResultSet&)>;                          // 查询回调
+    using UpdateCallback = std::function<void(int affectedRows, int lastInsertId)>;         // 插入或者删除回调
+    using TransactionCallback = std::function<void(bool success)>;                          // 事务回调：成功或失败
 
     // =========================================================
     // 异步查询 (SELECT 语句)
@@ -32,7 +32,7 @@ public:
     // 异步更新 (INSERT / UPDATE / DELETE 语句)
     // =========================================================
     static void AsyncUpdate(EventLoop* loop, ThreadPool* threadPool,
-        const std::string& sql, const DbParams& params, UpdateCallback cb);
+        const std::string& sql, const DbParams& params, UpdateCallback cb, bool fetch_insert_id = false /* 是否查询最后插入id*/);
 
     // =========================================================
     // 异步事务 (保证多条 SQL 原子性)
