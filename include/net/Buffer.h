@@ -50,12 +50,28 @@ public:
 		Append(static_cast<const char*>(static_cast<void*>(&be32)), sizeof(be32));
 	}
 
+	// 查询当前位置后2字节int数据，并不读取
+	uint16_t PeekInt16() const
+	{
+		uint16_t be16 = 0;
+		::memcpy(&be16, peek(), sizeof(be16));
+		return ntohs(be16);													// 转回主机字节序
+	}
+
 	// 查询当前位置后4字节int数据，并不读取
 	int32_t PeekInt32() const
 	{
 		int32_t be32 = 0;
 		::memcpy(&be32, peek(), sizeof(be32));
 		return ntohl(be32);													// 转回主机字节序
+	}
+
+	// 读取16位整数
+	uint16_t RetrieveInt16()
+	{
+		uint16_t result = PeekInt16();
+		retrieve(sizeof(uint16_t));
+		return result;
 	}
 
 	// 读取 32 位整数 (移动读指针，用于剥离包头)
