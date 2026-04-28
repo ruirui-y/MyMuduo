@@ -109,8 +109,12 @@ void TcpConnection::ShutDown()
 {
     if (state_ == kConnected)
     {
-        SetState(kDisconnecting);
-        loop_->RunInLoop([this]() { ShutDownInLoop(); });
+        auto conn = shared_from_this();
+        loop_->RunInLoop([conn]() 
+            { 
+                conn->SetState(kDisconnecting);
+                conn->ShutDownInLoop(); 
+            });
     }
 }
 
@@ -118,9 +122,12 @@ void TcpConnection::ForceClose()
 {
     if (state_ == kConnected || state_ == kDisconnecting)
     {
-        SetState(kDisconnecting);
         auto conn = shared_from_this();
-        loop_->RunInLoop([conn]() { conn->HandleClose(); });
+        loop_->RunInLoop([conn]() 
+            {
+                conn->SetState(kDisconnecting);
+                conn->HandleClose();
+            });
     }
 }
 

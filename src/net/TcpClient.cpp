@@ -76,7 +76,8 @@ void TcpClient::NewConnection(int sockfd)
         connection_ = conn;
     }
 
-    connection_->ConnectEstablished();
+    // 向conn提交连接初始化函数
+    ThreadSwitcher::Run(loop_, connection_, &TcpConnection::ConnectEstablished);
 }
 
 void TcpClient::RemoveConnection(const TcpConnectionPtr& conn)
