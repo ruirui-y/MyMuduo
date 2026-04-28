@@ -7,6 +7,7 @@
 #include <sys/uio.h>
 #include <arpa/inet.h>
 #include <cstring>
+#include <cassert>
 
 
 /// A buffer class modeled after org.jboss.netty.buffer.ChannelBuffer
@@ -43,30 +44,27 @@ public:
 		write_index_ += len;
 	}
 
-	// 追加int
-	void AppendInt32(int32_t x)
+	// ==========================================
+	// 16位 (通常用于 Header 长度、MsgId 的简写等)
+	// ==========================================
+
+	// 追加 16 位无符号整数
+	void AppendInt16(uint16_t x)
 	{
-		int32_t be32 = htonl(x);											// 转换成网络字节序
-		Append(static_cast<const char*>(static_cast<void*>(&be32)), sizeof(be32));
+		uint16_t be16 = htons(x);                                           // 转换成网络字节序
+		Append(static_cast<const char*>(static_cast<void*>(&be16)), sizeof(be16));
 	}
 
-	// 查询当前位置后2字节int数据，并不读取
+	// 查询当前位置后 2 字节无符号整数，并不读取
 	uint16_t PeekInt16() const
 	{
+		assert(ReadableBytes() >= sizeof(uint16_t));
 		uint16_t be16 = 0;
 		::memcpy(&be16, peek(), sizeof(be16));
-		return ntohs(be16);													// 转回主机字节序
+		return ntohs(be16);                                                 // 转回主机字节序
 	}
 
-	// 查询当前位置后4字节int数据，并不读取
-	int32_t PeekInt32() const
-	{
-		int32_t be32 = 0;
-		::memcpy(&be32, peek(), sizeof(be32));
-		return ntohl(be32);													// 转回主机字节序
-	}
-
-	// 读取16位整数
+	// 读取 16 位无符号整数 (移动读指针)
 	uint16_t RetrieveInt16()
 	{
 		uint16_t result = PeekInt16();
@@ -74,11 +72,31 @@ public:
 		return result;
 	}
 
-	// 读取 32 位整数 (移动读指针，用于剥离包头)
-	int32_t RetrieveInt32()
+	// ==========================================
+	// 32位 (通常用于 TotalLen、MsgId 等)
+	// ==========================================
+
+	// 追加 32 位无符号整数
+	void AppendInt32(uint32_t x)
 	{
-		int32_t result = PeekInt32();
-		retrieve(sizeof(int32_t));
+		uint32_t be32 = htonl(x);                                           // 转换成网络字节序
+		Append(static_cast<const char*>(static_cast<void*>(&be32)), sizeof(be32));
+	}
+
+	// 查询当前位置后 4 字节无符号整数，并不读取
+	uint32_t PeekInt32() const
+	{
+		assert(ReadableBytes() >= sizeof(uint32_t));
+		uint32_t be32 = 0;
+		::memcpy(&be32, peek(), sizeof(be32));
+		return ntohl(be32);                                                 // 转回主机字节序
+	}
+
+	// 读取 32 位无符号整数 (移动读指针)
+	uint32_t RetrieveInt32()
+	{
+		uint32_t result = PeekInt32();
+		retrieve(sizeof(uint32_t));
 		return result;
 	}
 
