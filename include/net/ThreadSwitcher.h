@@ -57,6 +57,25 @@ public:
                 });
         }
     }
+
+    // =================================================================
+    // Lambda 表达式 / Functor 版本
+    // 允许直接投递任意可调用对象，极大地提升了灵活性
+    // =================================================================
+    template<typename Func>
+    static void Run(EventLoop* loop, Func&& func)
+    {
+        if (loop->IsInLoopThread())
+        {
+            // 如果已经在当前线程，直接完美转发并执行
+            std::forward<Func>(func)();
+        }
+        else
+        {
+            // 否则派发到 Loop 线程排队执行
+            loop->QueueInLoop(std::forward<Func>(func));
+        }
+    }
 };
 
 #endif
