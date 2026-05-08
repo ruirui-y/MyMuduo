@@ -3,6 +3,7 @@
 
 #include "noncopyable.h"
 #include <string>
+#include <cstdint>
 
 class Socket : noncopyable
 {
