@@ -23,6 +23,12 @@ public:
 	void ShutdownWrite();																// 关闭写端fd
 	int GetTcpInfoError() const;														// 获取TCP错误信息
 	void SetTcpNoDelay();																// 设置TCP无延迟
+
+public:
+	// 端口复用, 必须在bind之前调用
+	void SetReuseAddr(bool on);															
+	void SetReusePort(bool on);
+
 private:
 	const int socket_fd_;
 };

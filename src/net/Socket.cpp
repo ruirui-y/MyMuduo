@@ -1,3 +1,5 @@
+#include "Socket.h"
+#include "Socket.h"
 #include "net/Socket.h"
 #include "Log/Logger.h"
 #include <unistd.h>
@@ -80,5 +82,25 @@ void Socket::SetTcpNoDelay()
     if (::setsockopt(socket_fd_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval)) < 0)
     {
         LOG_ERROR << "sockets::setTcpNoDelay error";
+    }
+}
+
+void Socket::SetReuseAddr(bool on)
+{
+    int optval = on ? 1 : 0;
+    // 设置 SO_REUSEADDR，解决 TIME_WAIT 状态导致端口被占用的问题
+    if (::setsockopt(socket_fd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
+    {
+        LOG_ERROR << "Socket::SetReuseAddr error";
+    }
+}
+
+void Socket::SetReusePort(bool on)
+{
+    int optval = on ? 1 : 0;
+    // 设置 SO_REUSEPORT，允许多个线程/进程绑定同一个端口（内核级负载均衡）
+    if (::setsockopt(socket_fd_, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) < 0)
+    {
+        LOG_ERROR << "Socket::SetReusePort error";
     }
 }

@@ -13,6 +13,10 @@ Acceptor::Acceptor(EventLoop* loop, const std::string& ip, uint16_t port)
 	listening_(false),
     idle_fd_(::open("/dev/null", O_RDONLY | O_CLOEXEC))
 {
+    // 在 bind 之前，开启端口复用！
+    accept_socket_.SetReuseAddr(true);
+    accept_socket_.SetReusePort(true);
+
     accept_socket_.BindAddress(ip, port);
     accept_channel_.SetReadCallback([this]() { HandleRead(); });
 }
