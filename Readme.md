@@ -25,13 +25,31 @@
 
 ## 🛠️ 编译与安装
 
-要求：CMake >= 3.14，支持 C++17。
+要求：Ubuntu 环境，CMake >= 3.14，支持 C++17。
+
+### 1. 一键初始化环境
+
+本项目提供了一键配置脚本，自动安装编译所需的工具链及第三方依赖（OpenSSL, MySQL Connector, hiredis, nlohmann/json 等）：
 
 ```bash
 git clone https://github.com/ruirui-y/MyMuduo.git
 cd MyMuduo
+
+# 赋予执行权限
+chmod +x setup_env.sh
+
+# 一键执行！自动配置所有依赖环境
+./setup_env.sh
+```
+
+### 2. 编译并部署系统库
+
+环境就绪后，执行以下命令完成核心库的编译与安装：
+
+```Bash
 mkdir build && cd build
 cmake ..
 make -j4
 sudo make install
 ```
+
