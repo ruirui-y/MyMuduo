@@ -1,6 +1,7 @@
 #include "net/TcpServer.h"
 #include "Log/Logger.h"
 #include "net/ThreadSwitcher.h"
+#include "net/SSLContext.h"
 #include <signal.h>
 
 using namespace std::placeholders;
@@ -79,7 +80,13 @@ void TcpServer::RefreshEntry(TcpConnection::EntryPtr entry)
         });
 }
 
-void TcpServer::NewConnection(int sockfd, const std::string& peerAddr) 
+void TcpServer::EnableSSL(const std::string& cert_path, const std::string& key_path)
+{
+    ssl_ctx_ = std::make_shared<SSLContext>();
+    ssl_ctx_->LoadCertificate(cert_path, key_path);
+}
+
+void TcpServer::NewConnection(int sockfd, const std::string& peerAddr)
 {
     LOG_INFO << "TcpServer::NewConnection - new connection from " << peerAddr << "sockfd = " << sockfd;
 
@@ -89,6 +96,12 @@ void TcpServer::NewConnection(int sockfd, const std::string& peerAddr)
 
     // 1. 创建 TcpConnection 对象
     auto conn = std::make_shared<TcpConnection>(loop, sockfd);
+
+    // 判断server是否开启了加密, 如果开启进行加密的握手校验
+    if (ssl_ctx_)
+    {
+        conn->EnableSSL(ssl_ctx_->GetContext(), true);
+    }
 
     // 2. 挪移到时间轮中管理超时
     TcpConnection::EntryPtr entry = std::make_shared<TcpConnection::Entry>(conn);

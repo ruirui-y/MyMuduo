@@ -9,6 +9,8 @@
 #include <string>
 #include <functional>
 #include <any>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 class EventLoop;
 class TcpConnection;
@@ -80,12 +82,18 @@ public:
 	const std::any& GetContext() const { return context_; }
 	std::any* GetMutableContext() { return &context_; }
 
+	// 加密
+	void EnableSSL(SSL_CTX* ctx, bool is_server);
+
 private:
 	void HandleRead();															// 处理读事件
 	void HandleWrite();															// 处理写事件	
 	void HandleClose();															// 处理关闭事件
     void HandleError();															// 处理错误事件
 	void ShutDownInLoop();														// 在loop中关闭连接
+
+	// 处理SSL握手状态
+	void HandleSSLHandshake();
 
 private:
 	EventLoop* loop_;															// 所属的EventLoop										
@@ -105,6 +113,12 @@ private:
 	std::weak_ptr<Entry> entry_;												// conn的包装器，用于挪移到时间轮的桶子里
 
 	std::any context_;															// 万能口袋
+
+private:
+	// 加密模块
+	SSL* ssl_ = nullptr;
+	bool bis_ssl_ = false;														// 是否开启ssl
+	bool bssl_handshake_ = false;												// ssl握手是否完成
 };
 
 #endif

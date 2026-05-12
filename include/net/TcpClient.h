@@ -6,6 +6,8 @@
 #include "net/Connector.h"
 #include <mutex>
 
+class SSLContext;
+
 class TcpClient : noncopyable
 {
 public:
@@ -31,6 +33,8 @@ public:
     void SetMessageCallback(MessageCallback cb) { message_callback_ = std::move(cb); }
     void SetWriteCompleteCallback(WriteCompleteCallback cb) { write_complete_callback_ = std::move(cb); }
 
+    void EnableSSL();                                                                               // 开启客户端加密
+
 private:
     void NewConnection(int sockfd);
     void RemoveConnection(const TcpConnectionPtr& conn);
@@ -50,6 +54,8 @@ private:
     int nextConnId_;
     mutable std::mutex mutex_;
     TcpConnectionPtr connection_;
+
+    std::shared_ptr<SSLContext> ssl_ctx_;                                                           // SSL上下文
 };
 
 #endif

@@ -34,6 +34,7 @@ target_link_libraries(mymuduo PUBLIC
     pthread 
     mysqlcppconn  # 架构师补丁：支持 ConnectionPool 和 SqlExec
     hiredis       # 如果你的 base/net 里用到了 redis，也放这里
+    openssl       # 如果你的 base/net 里用到了 SSL，也放这里
 )
 
 # ==========================================

@@ -9,6 +9,8 @@
 #include <memory>
 #include <unordered_set>
 
+class SSLContext;
+
 class TcpServer : noncopyable
 {
 public:
@@ -19,6 +21,8 @@ public:
 	void Start(int thread_num);
 	void SetMessageCallback(MessageCallback cb) { message_cb_ = cb; }
 	void SetConnectionCallback(const ConnectionCallback& cb) { connection_callback_ = cb; }
+
+	void EnableSSL(const std::string& cert_path, const std::string& key_path);						// 开启服务端加密
 
 private:
 	void NewConnection(int sockfd, const std::string& peerAddr);									// 处理新连接的回调
@@ -51,6 +55,8 @@ private:
 	TimingWheel wheel_;																				// 轮子的大小是连接的超时时间
 	int wheel_size_;
 	int wheel_curr_ = 0;
+
+	std::shared_ptr<SSLContext> ssl_ctx_;															// SSL上下文
 };
 
 #endif

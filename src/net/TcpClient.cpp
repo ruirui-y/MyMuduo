@@ -2,6 +2,7 @@
 #include "Log/Logger.h"
 #include <sys/socket.h>
 #include "net/ThreadSwitcher.h"
+#include "net/SSLContext.h"
 
 using namespace std::placeholders;
 
@@ -57,11 +58,23 @@ void TcpClient::Stop()
     connector_->Stop();
 }
 
+void TcpClient::EnableSSL()
+{
+    ssl_ctx_ = std::make_shared<SSLContext>();
+    LOG_INFO << "TcpClient 开启 SSL 加密模式，准备发起安全连接。";
+}
+
 void TcpClient::NewConnection(int sockfd)
 {
     loop_->AssertInLoopThread();
 
     TcpConnectionPtr conn = std::make_shared<TcpConnection>(loop_, sockfd);
+
+    // 判断是否需要加密
+    if (ssl_ctx_)
+    {
+        conn->EnableSSL(ssl_ctx_->GetContext(), false);
+    }
 
     // 设置回调
     conn->SetConnectionCallback(connection_callback_);

@@ -179,7 +179,7 @@ void Connector::Retry(int sockfd)
     SetState(kDisconnected);
     if (connect_)
     {
-        LOG_INFO << "Connector::retry - connecting to " << ip_ << " " << port_ << " in 2 seconds...";
+        LOG_DEBUG << "Connector::retry - connecting to " << ip_ << " " << port_ << " in 2 seconds...";
         // 此处为了简化工程，休眠一会儿然后投递重试任务，实际可配合 TimerQueue
         loop_->RunAfter(2.0, std::bind(&Connector::StartInLoop, shared_from_this()));
     }
