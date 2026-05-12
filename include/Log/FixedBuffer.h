@@ -1,6 +1,6 @@
 #pragma once
 
-#include "noncopyable.h"
+#include "../noncopyable.h"
 #include <cstring>
 using namespace std;
 

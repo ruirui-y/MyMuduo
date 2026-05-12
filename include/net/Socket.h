@@ -1,7 +1,7 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
-#include "noncopyable.h"
+#include "../noncopyable.h"
 #include <string>
 #include <cstdint>
 

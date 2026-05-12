@@ -25,10 +25,6 @@ add_library(mymuduo STATIC ${SRC})
 # 任何链接了 mymuduo 的测试程序，也会自动继承这些头文件路径！(免去反复 include)
 target_include_directories(mymuduo PUBLIC 
     ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/include/base
-    ${PROJECT_SOURCE_DIR}/include/net
-    ${PROJECT_SOURCE_DIR}/include/Log
-    ${PROJECT_SOURCE_DIR}/include/db
 )
 
 # 链接第三方库依赖
@@ -64,7 +60,7 @@ add_mymuduo_test(test_timer            ${PROJECT_SOURCE_DIR}/src/test/test_timer
 install(TARGETS mymuduo ARCHIVE DESTINATION lib)
 
 # 2. 拷贝你对外暴露的头文件到系统 include 目录 (假设你集中存放在顶层的 include 目录)
-# 这样别人写代码就可以直接 #include <mymuduo/TcpServer.h> 了
+# 执行sudo make install 将include下的.h文件全部安装到 /usr/local + / + include/mymuduo = /usr/local/include/mymuduo下
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ 
         DESTINATION include/mymuduo 
         FILES_MATCHING PATTERN "*.h"

@@ -2,7 +2,7 @@
 #define TIMER_H
 
 #include "Timestamp.h"
-#include "noncopyable.h"
+#include "../noncopyable.h"
 #include <functional>
 #include <atomic>
 

@@ -1,6 +1,6 @@
 #ifndef EVENT_LOOP_THREAD_H
 #define EVENT_LOOP_THREAD_H
-#include "noncopyable.h"
+#include "../noncopyable.h"
 #include <thread>
 #include <mutex>
 #include <condition_variable>

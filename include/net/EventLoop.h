@@ -1,7 +1,7 @@
 #ifndef EVENTLOOP_H
 #define EVENTLOOP_H
 
-#include "noncopyable.h"
+#include "../noncopyable.h"
 #include "net/Poller.h"
 #include "net/Channel.h"
 #include "net/TimerQueue.h"

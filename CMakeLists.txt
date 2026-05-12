@@ -2,7 +2,8 @@
 # MyMuduo 核心网络库构建系统 (Root CMakeLists)
 # ==============================================================================
 
-cmake_minimum_required(VERSION 3.0)
+# 适配更高的最低版本
+cmake_minimum_required(VERSION 3.10)
 project(MyMuduo)
 
 # ==========================================

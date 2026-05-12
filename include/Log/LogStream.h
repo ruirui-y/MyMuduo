@@ -1,6 +1,6 @@
 #ifndef LOG_STREAM_H
 #define LOG_STREAM_H
-#include "noncopyable.h"
+#include "../noncopyable.h"
 #include "FixedBuffer.h"
 #include <string>
 #include <string.h>

@@ -1,7 +1,7 @@
 #ifndef ASYNC_LOGGING_H
 #define ASYNC_LOGGING_H
 #include "LogStream.h"
-#include "noncopyable.h"
+#include "../noncopyable.h"
 #include <vector>
 #include <memory>
 #include <mutex>

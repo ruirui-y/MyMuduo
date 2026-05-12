@@ -1,7 +1,7 @@
 #ifndef POLLER_H
 #define POLLER_H
 
-#include "noncopyable.h"
+#include "../noncopyable.h"
 #include <vector>
 #include <map>
 

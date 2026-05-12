@@ -1,7 +1,7 @@
 #ifndef TCPCONNECTION_H
 #define TCPCONNECTION_H
 
-#include "noncopyable.h"
+#include "../noncopyable.h"
 #include "net/Channel.h"
 #include "net/Socket.h"
 #include "net/Buffer.h"

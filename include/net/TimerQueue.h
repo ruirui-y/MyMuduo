@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <set>
-#include "noncopyable.h"
+#include "../noncopyable.h"
 #include "net/Channel.h"
 #include "net/Timer.h"
 
